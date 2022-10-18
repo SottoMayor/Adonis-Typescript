@@ -18,6 +18,6 @@ test.group('User Tests', () => {
     assert.equal(response.body().user.email, userData.email)
     assert.equal(response.body().user.username, userData.username)
     assert.equal(response.body().user.avatar, userData.avatar)
-    assert.equal(response.body().user.password, userData.password)
+    assert.notExists(response.body().user.password, 'User PASSWORD defined')
   }).pin()
 })
