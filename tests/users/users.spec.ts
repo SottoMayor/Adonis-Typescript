@@ -1,4 +1,5 @@
 import { test } from '@japa/runner'
+import { UserFactory } from 'Database/factories'
 
 test.group('User Tests', () => {
   test('It should create an user', async ({ client, assert }) => {
@@ -19,5 +20,20 @@ test.group('User Tests', () => {
     assert.equal(response.body().user.username, userData.username)
     assert.equal(response.body().user.avatar, userData.avatar)
     assert.notExists(response.body().user.password, 'User PASSWORD defined')
+  })
+
+  test('It throws an error when the email is already in use', async ({ client }) => {
+    const { email } = await UserFactory.create()
+
+    const userData = {
+      username: 'John Doe',
+      email: email,
+      password: 'test123',
+      avatar: 'https://test.com/images/1',
+    }
+
+    const response = await client.post('/users').json(userData)
+
+    response.assertStatus(409)
   }).pin()
 })
