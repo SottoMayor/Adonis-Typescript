@@ -42,5 +42,20 @@ test.group('User Tests', (group) => {
     const response = await client.post('/users').json(userData)
 
     response.assertStatus(409)
+  })
+
+  test('It throws an error when the username is already in use', async ({ client }) => {
+    const { username } = await UserFactory.create()
+
+    const userData = {
+      username: username,
+      email: 'test@test.com',
+      password: 'test123',
+      avatar: 'https://test.com/images/1',
+    }
+
+    const response = await client.post('/users').json(userData)
+
+    response.assertStatus(409)
   }).pin()
 })
