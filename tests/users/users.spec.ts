@@ -89,4 +89,21 @@ test.group('User Tests', (group) => {
 
     response.assertStatus(422)
   })
+
+  test('It updates an user', async ({ client, assert }) => {
+    const user = await UserFactory.create()
+
+    const updatedUser = {
+      ...user,
+      email: 'test@example.com',
+      avatar: 'https://test.com/1',
+    }
+
+    const response = await client.patch('/users/' + user.id).json(updatedUser)
+
+    response.assertStatus(200)
+
+    assert.equal(response.body().user.email, updatedUser.email)
+    assert.equal(response.body().user.avatar, updatedUser.avatar)
+  }).pin()
 })

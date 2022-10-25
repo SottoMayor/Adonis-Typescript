@@ -24,3 +24,4 @@ Route.get('/', async () => {
   return { hello: 'world' }
 })
 Route.post('/users', 'UsersController.createUser')
+Route.patch('/users/:id', 'UsersController.updateUser')
