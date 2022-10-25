@@ -3,7 +3,6 @@ import { test } from '@japa/runner'
 import { UserFactory } from 'Database/factories'
 
 test.group('User Tests', (group) => {
-
   group.each.setup(async () => {
     await Database.beginGlobalTransaction()
     return await Database.rollbackGlobalTransaction()
@@ -25,7 +24,6 @@ test.group('User Tests', (group) => {
     assert.exists(response.body().user.id, 'User ID undefined')
     assert.equal(response.body().user.email, userData.email)
     assert.equal(response.body().user.username, userData.username)
-    assert.equal(response.body().user.avatar, userData.avatar)
     assert.notExists(response.body().user.password, 'User PASSWORD defined')
   })
 
@@ -57,5 +55,38 @@ test.group('User Tests', (group) => {
     const response = await client.post('/users').json(userData)
 
     response.assertStatus(409)
-  }).pin()
+  })
+
+  test('It throws an error 422 if the username, email or password in not provided', async ({
+    client,
+  }) => {
+    const response = await client.post('/users').json({})
+
+    response.assertStatus(422)
+  })
+
+  test('It throws an error 422 if the email is invalid', async ({ client }) => {
+    const userData = await UserFactory.create()
+    const response = await client.post('/users').json({ ...userData, email: 'test' })
+
+    response.assertStatus(422)
+  })
+
+  test('It throws an error 422 if the password is less then 5', async ({ client }) => {
+    const userData = await UserFactory.create()
+    const response = await client.post('/users').json({ ...userData, password: '1234' })
+
+    response.assertStatus(422)
+  })
+
+  test('It throws an error 422 if the password is greater then 100', async ({ client }) => {
+    const userData = await UserFactory.create()
+    const response = await client.post('/users').json({
+      ...userData,
+      password:
+        '12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901',
+    })
+
+    response.assertStatus(422)
+  })
 })
