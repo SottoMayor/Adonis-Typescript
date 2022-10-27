@@ -1,6 +1,7 @@
 import Database from '@ioc:Adonis/Lucid/Database'
 import { test } from '@japa/runner'
 import { UserFactory } from 'Database/factories'
+import Hash from '@ioc:Adonis/Core/Hash'
 
 test.group('User Tests', (group) => {
   group.each.setup(async () => {
@@ -105,5 +106,26 @@ test.group('User Tests', (group) => {
 
     assert.equal(response.body().user.email, updatedUser.email)
     assert.equal(response.body().user.avatar, updatedUser.avatar)
+  })
+
+  test("It updates the user's password", async ({ client, assert }) => {
+    const user = await UserFactory.create()
+
+    const newPassword = 'test1234'
+
+    const updatedUser = {
+      ...user,
+      password: newPassword,
+    }
+
+    const response = await client.patch('/users/' + user.id).json(updatedUser)
+
+    response.assertStatus(200)
+
+    await user.refresh()
+
+    assert.equal(response.body().user.id, user.id)
+    
+    assert.isTrue(await Hash.verify(user.password, newPassword))
   }).pin()
 })
