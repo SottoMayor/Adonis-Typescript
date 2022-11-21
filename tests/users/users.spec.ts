@@ -176,5 +176,5 @@ test.group('User Tests', (group) => {
     assert.equal(body.status, 422)
     assert.equal(body.code, 'BAD_REQUEST')
     assert.equal('avatar', body.errors.find((err: any) => err.field === 'avatar').field)
-  }).pin()
+  })
 })
