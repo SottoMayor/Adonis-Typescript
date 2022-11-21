@@ -125,7 +125,56 @@ test.group('User Tests', (group) => {
     await user.refresh()
 
     assert.equal(response.body().user.id, user.id)
-    
+
     assert.isTrue(await Hash.verify(user.password, newPassword))
+  })
+
+  test('It should return 422 when the required data is not provided', async ({
+    client,
+    assert,
+  }) => {
+    const { id } = await UserFactory.create()
+
+    const {
+      response: { body },
+    } = await client.patch(`/users/${id}`).json({})
+
+    assert.equal(body.status, 422)
+    assert.equal(body.code, 'BAD_REQUEST')
+  })
+
+  test('It should return 422 when the provided email is invalid', async ({ client, assert }) => {
+    const { id, password } = await UserFactory.create()
+
+    const {
+      response: { body },
+    } = await client.patch(`/users/${id}`).json({ email: 'teste.com', password })
+
+    assert.equal(body.status, 422)
+    assert.equal(body.code, 'BAD_REQUEST')
+  })
+
+  test('It should return 422 when the provided password is invalid', async ({ client, assert }) => {
+    const { id, email } = await UserFactory.create()
+
+    const {
+      response: { body },
+    } = await client.patch(`/users/${id}`).json({ email, password: 'oi' })
+
+    assert.equal(body.status, 422)
+    assert.equal(body.code, 'BAD_REQUEST')
+    assert.equal('password', body.errors.find((err: any) => err.field === 'password').field)
+  })
+
+  test('It should return 422 when the provided avatar is invalid', async ({ client, assert }) => {
+    const { id, email, password } = await UserFactory.create()
+
+    const {
+      response: { body },
+    } = await client.patch(`/users/${id}`).json({ email, password, avatar: 'test' })
+
+    assert.equal(body.status, 422)
+    assert.equal(body.code, 'BAD_REQUEST')
+    assert.equal('avatar', body.errors.find((err: any) => err.field === 'avatar').field)
   }).pin()
 })
