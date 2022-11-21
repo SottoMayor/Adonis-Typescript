@@ -36,6 +36,7 @@ export default class UsersController {
     user.email = email
     user.password = password
     if (user.avatar) {
+      // @ts-ignore
       user.avatar = avatar
     }
 

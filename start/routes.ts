@@ -25,3 +25,4 @@ Route.get('/', async () => {
 })
 Route.post('/users', 'UsersController.createUser')
 Route.patch('/users/:id', 'UsersController.updateUser')
+Route.post('/forgot-password', 'PasswordsController.forgotPassword')
